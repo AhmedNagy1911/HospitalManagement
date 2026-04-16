@@ -3,9 +3,6 @@ using HospitalManagement.Domain.Abstractions;
 using HospitalManagement.Domain.Entities;
 using HospitalManagement.Domain.Errors;
 using HospitalManagement.Domain.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace HospitalManagement.Application.Doctors.Services;
 

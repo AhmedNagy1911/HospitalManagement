@@ -1,5 +1,4 @@
-﻿using HospitalManagement.Application.Doctors.Services;
-using HospitalManagement.Domain.Repositories;
+﻿using HospitalManagement.Domain.Repositories;
 using HospitalManagement.Infrastructure.Persistence;
 using HospitalManagement.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +23,6 @@ public static class DependencyInjection
             sp.GetRequiredService<ApplicationDbContext>());
 
         services.AddScoped<IDoctorRepository, DoctorRepository>();
-        services.AddScoped<IDoctorService, DoctorService>();
 
         return services;
     }

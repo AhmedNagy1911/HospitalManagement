@@ -1,4 +1,5 @@
-﻿using HospitalManagement.Application.Doctors.DTOs;
+﻿using HospitalManagement.API.Extensions;
+using HospitalManagement.Application.Doctors.DTOs;
 using HospitalManagement.Application.Doctors.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,10 +22,7 @@ public sealed class DoctorsController(IDoctorService doctorService) : Controller
     {
         var result = await doctorService.GetByIdAsync(id, ct);
 
-        if (result.IsFailure)
-            return NotFound(result.Error);
-
-        return Ok(result.Value);
+        return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
 
     [HttpPost]
@@ -32,10 +30,7 @@ public sealed class DoctorsController(IDoctorService doctorService) : Controller
     {
         var result = await doctorService.CreateAsync(request, ct);
 
-        if (result.IsFailure)
-            return BadRequest(result.Error);
-
-        return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
+        return result.IsSuccess ? CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value) : result.ToProblem();
     }
 
     [HttpPut("{id:guid}")]
@@ -43,10 +38,7 @@ public sealed class DoctorsController(IDoctorService doctorService) : Controller
     {
         var result = await doctorService.UpdateAsync(id, request, ct);
 
-        if (result.IsFailure)
-            return NotFound(result.Error);
-
-        return Ok(result.Value);
+        return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
 
     [HttpDelete("{id:guid}")]
@@ -54,9 +46,6 @@ public sealed class DoctorsController(IDoctorService doctorService) : Controller
     {
         var result = await doctorService.DeleteAsync(id, ct);
 
-        if (result.IsFailure)
-            return NotFound(result.Error);
-
-        return NoContent();
+        return result.IsSuccess ? NoContent() : result.ToProblem();
     }
 }
