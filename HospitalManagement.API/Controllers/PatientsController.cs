@@ -1,4 +1,5 @@
-﻿using HospitalManagement.Application.Patients.DTOs;
+﻿using HospitalManagement.API.Extensions;
+using HospitalManagement.Application.Patients.DTOs;
 using HospitalManagement.Application.Patients.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +24,7 @@ public class PatientsController : ControllerBase
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value)
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // GET api/patients/{id}
@@ -34,7 +35,7 @@ public class PatientsController : ControllerBase
 
         return result.IsSuccess
             ? Ok(result.Value)
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // GET api/patients?searchTerm=ahmed&gender=Male&bloodType=A%2B&isActive=true&page=1&pageSize=10
@@ -58,7 +59,7 @@ public class PatientsController : ControllerBase
 
         return result.IsSuccess
             ? Ok(result.Value)
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // DELETE api/patients/{id}  (soft delete)
@@ -69,7 +70,7 @@ public class PatientsController : ControllerBase
 
         return result.IsSuccess
             ? NoContent()
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // ── Medical History ───────────────────────────────────────
@@ -83,7 +84,7 @@ public class PatientsController : ControllerBase
 
         return result.IsSuccess
             ? Ok(result.Value)
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // POST api/patients/{patientId}/medical-history
@@ -97,7 +98,7 @@ public class PatientsController : ControllerBase
 
         return result.IsSuccess
             ? Ok()
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // ── Doctor Assignment ─────────────────────────────────────
@@ -111,7 +112,7 @@ public class PatientsController : ControllerBase
 
         return result.IsSuccess
             ? Ok()
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // DELETE api/patients/{patientId}/doctors/{doctorId}
@@ -123,6 +124,6 @@ public class PatientsController : ControllerBase
 
         return result.IsSuccess
             ? NoContent()
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 }
