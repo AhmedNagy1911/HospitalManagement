@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
 using HospitalManagement.Application.Doctors.Services;
+using HospitalManagement.Application.Patients.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -17,6 +18,7 @@ public static class DependencyInjection
 
         // Register services
         services.AddScoped<IDoctorService, DoctorService>();
+        services.AddScoped<IPatientService, PatientService>();
 
         return services;
     }

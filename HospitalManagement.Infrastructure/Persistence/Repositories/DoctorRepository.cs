@@ -24,6 +24,8 @@ public sealed class DoctorRepository(ApplicationDbContext context) : IDoctorRepo
     public async Task<bool> ExistsByLicenseNumberAsync(string licenseNumber, CancellationToken cancellationToken = default)
         => await context.Doctors.AnyAsync(d => d.LicenseNumber == licenseNumber, cancellationToken);
 
+    public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
+        => await context.Doctors.AnyAsync(p => p.Id == id, cancellationToken);
     public void Add(Doctor doctor)
         => context.Doctors.Add(doctor);
 

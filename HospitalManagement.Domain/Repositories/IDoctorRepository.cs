@@ -10,6 +10,7 @@ public interface IDoctorRepository
     Task<IReadOnlyList<Doctor>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default);
     Task<bool> ExistsByLicenseNumberAsync(string licenseNumber, CancellationToken cancellationToken = default);
+    Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default);
     void Add(Doctor doctor);
     void Update(Doctor doctor);
     void Delete(Doctor doctor);

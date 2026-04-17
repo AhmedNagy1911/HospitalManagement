@@ -3,9 +3,11 @@
 public class Doctor
 {
     public Guid Id { get; private set; }
+    //[RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "First name must contain only letters.")]
     public string FirstName { get; private set; } = string.Empty;
     public string LastName { get; private set; } = string.Empty;
     public string Specialization { get; private set; } = string.Empty;
+   // [EmailAddress(ErrorMessage = "Invalid email address format.")]
     public string Email { get; private set; } = string.Empty;
     public string PhoneNumber { get; private set; } = string.Empty;
     public string LicenseNumber { get; private set; } = string.Empty;

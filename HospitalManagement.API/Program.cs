@@ -1,7 +1,4 @@
 using HospitalManagement.API.Middleware;
-using HospitalManagement.Application.Doctors.Services;
-using HospitalManagement.Domain.Repositories;
-using HospitalManagement.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using HospitalManagement.Infrastructure;
 

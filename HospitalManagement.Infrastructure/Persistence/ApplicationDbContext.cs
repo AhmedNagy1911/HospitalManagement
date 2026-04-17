@@ -7,6 +7,10 @@ namespace HospitalManagement.Infrastructure.Persistence;
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IUnitOfWork
 {
     public DbSet<Doctor> Doctors => Set<Doctor>();
+    public DbSet<Patient> Patients => Set<Patient>();
+    public DbSet<MedicalHistory> MedicalHistories => Set<MedicalHistory>();
+    public DbSet<PatientDoctor> PatientDoctors => Set<PatientDoctor>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
