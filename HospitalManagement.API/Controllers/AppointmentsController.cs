@@ -62,7 +62,7 @@ public class AppointmentsController(IAppointmentService appointmentService) : Co
     // ── Status Transitions ────────────────────────────────────
 
     // PATCH api/appointments/{id}/confirm
-    [HttpPatch("{id:guid}/confirm")]
+    [HttpPut("{id:guid}/confirm")]
     public async Task<IActionResult> Confirm(Guid id, CancellationToken cancellationToken)
     {
         var result = await _appointmentService.ConfirmAsync(id, cancellationToken);
@@ -73,7 +73,7 @@ public class AppointmentsController(IAppointmentService appointmentService) : Co
     }
 
     // PATCH api/appointments/{id}/complete
-    [HttpPatch("{id:guid}/complete")]
+    [HttpPut("{id:guid}/complete")]
     public async Task<IActionResult> Complete(Guid id, CancellationToken cancellationToken)
     {
         var result = await _appointmentService.CompleteAsync(id, cancellationToken);
@@ -84,7 +84,7 @@ public class AppointmentsController(IAppointmentService appointmentService) : Co
     }
 
     // PATCH api/appointments/{id}/cancel
-    [HttpPatch("{id:guid}/cancel")]
+    [HttpPut("{id:guid}/cancel")]
     public async Task<IActionResult> Cancel(
         Guid id,
         [FromBody] CancelAppointmentRequest request,

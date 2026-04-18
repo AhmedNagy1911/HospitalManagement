@@ -54,7 +54,7 @@ public class Patient
     }
 
     public void Deactivate() => IsActive = false;
-
+    public void Activate() => IsActive = true;
     public void AddMedicalHistory(string diagnosis, string treatment, string notes)
     {
         var history = MedicalHistory.Create(Id, diagnosis, treatment, notes);

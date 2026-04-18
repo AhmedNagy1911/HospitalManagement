@@ -34,4 +34,6 @@ public interface IPatientService
 
     Task<Result> RemoveDoctorAsync(
         Guid patientId, Guid doctorId, CancellationToken cancellationToken = default);
+
+    Task<Result> ActivateAsync(Guid id, CancellationToken cancellationToken = default);
 }

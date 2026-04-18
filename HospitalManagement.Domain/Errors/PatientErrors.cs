@@ -21,4 +21,7 @@ public static class PatientErrors
 
     public static readonly Error AlreadyDeactivated =
         new("Patient.AlreadyDeactivated", "Patient is already deactivated.", 400);
+
+    public static readonly Error AlreadyActivated =
+    new("Patient.AlreadyActivated", "Patient is already active.", 400);
 }

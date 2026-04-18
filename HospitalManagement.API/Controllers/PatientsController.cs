@@ -73,6 +73,16 @@ public class PatientsController : ControllerBase
             : result.ToProblem();
     }
 
+    // PATCH api/patients/{id}/activate
+    [HttpPut  ("{id:guid}/activate")]
+    public async Task<IActionResult> Activate(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _patientService.ActivateAsync(id, cancellationToken);
+        return result.IsSuccess
+            ? Ok()
+            : result.ToProblem();
+    }
+
     // ── Medical History ───────────────────────────────────────
 
     // GET api/patients/{patientId}/medical-history

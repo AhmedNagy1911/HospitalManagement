@@ -170,6 +170,21 @@ public class PatientService(
         return Result.Success();
     }
 
+    public async Task<Result> ActivateAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var patient = await _patientRepository.GetByIdAsync(id, cancellationToken);
+        if (patient is null)
+            return Result.Failure(PatientErrors.NotFound);
+
+        if (patient.IsActive)
+            return Result.Failure(PatientErrors.AlreadyActivated);
+
+        patient.Activate();
+        _patientRepository.Update(patient);
+        await _patientRepository.SaveChangesAsync(cancellationToken);
+        return Result.Success();
+    }
+
     // ── MAPPING ───────────────────────────────────────────────
     private static PatientResponse MapToResponse(Patient patient)
     {
