@@ -10,7 +10,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Patient> Patients => Set<Patient>();
     public DbSet<MedicalHistory> MedicalHistories => Set<MedicalHistory>();
     public DbSet<PatientDoctor> PatientDoctors => Set<PatientDoctor>();
-
+    public DbSet<Appointment> Appointments => Set<Appointment>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
