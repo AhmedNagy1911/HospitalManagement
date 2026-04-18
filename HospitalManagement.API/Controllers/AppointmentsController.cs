@@ -1,4 +1,5 @@
-﻿using HospitalManagement.Application.Appointments.DTOs;
+﻿using HospitalManagement.API.Extensions;
+using HospitalManagement.Application.Appointments.DTOs;
 using HospitalManagement.Application.Appointments.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +21,7 @@ public class AppointmentsController(IAppointmentService appointmentService) : Co
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value)
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // GET api/appointments/{id}
@@ -31,7 +32,7 @@ public class AppointmentsController(IAppointmentService appointmentService) : Co
 
         return result.IsSuccess
             ? Ok(result.Value)
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // GET api/appointments?patientId=...&doctorId=...&status=Scheduled&dateFrom=...&dateTo=...
@@ -55,7 +56,7 @@ public class AppointmentsController(IAppointmentService appointmentService) : Co
 
         return result.IsSuccess
             ? Ok(result.Value)
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // ── Status Transitions ────────────────────────────────────
@@ -68,7 +69,7 @@ public class AppointmentsController(IAppointmentService appointmentService) : Co
 
         return result.IsSuccess
             ? Ok()
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // PATCH api/appointments/{id}/complete
@@ -79,7 +80,7 @@ public class AppointmentsController(IAppointmentService appointmentService) : Co
 
         return result.IsSuccess
             ? Ok()
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // PATCH api/appointments/{id}/cancel
@@ -93,6 +94,6 @@ public class AppointmentsController(IAppointmentService appointmentService) : Co
 
         return result.IsSuccess
             ? NoContent()
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 }
