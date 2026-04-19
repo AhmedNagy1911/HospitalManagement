@@ -11,6 +11,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<MedicalHistory> MedicalHistories => Set<MedicalHistory>();
     public DbSet<PatientDoctor> PatientDoctors => Set<PatientDoctor>();
     public DbSet<Appointment> Appointments => Set<Appointment>();
+    public DbSet<Room> Rooms => Set<Room>();
+    public DbSet<Bed> Beds => Set<Bed>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
