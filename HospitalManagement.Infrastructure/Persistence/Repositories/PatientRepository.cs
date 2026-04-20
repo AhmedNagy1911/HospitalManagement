@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HospitalManagement.Infrastructure.Persistence.Repositories;
 
-public class PatientRepository : IPatientRepository
+public class PatientRepository(ApplicationDbContext context) : IPatientRepository
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ApplicationDbContext _context = context;
     public async Task<IEnumerable<Patient>> GetAllAsync(
     CancellationToken cancellationToken = default)
     => await _context.Patients
@@ -14,8 +14,6 @@ public class PatientRepository : IPatientRepository
             .ThenInclude(pd => pd.Doctor)
         .OrderBy(p => p.LastName).ThenBy(p => p.FirstName)
         .ToListAsync(cancellationToken);
-    public PatientRepository(ApplicationDbContext context)
-        => _context = context;
 
     public async Task<Patient?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         => await _context.Patients

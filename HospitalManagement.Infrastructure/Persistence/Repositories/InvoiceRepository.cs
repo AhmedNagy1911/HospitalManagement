@@ -5,11 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HospitalManagement.Infrastructure.Persistence.Repositories;
 
-public class InvoiceRepository : IInvoiceRepository
+public class InvoiceRepository(ApplicationDbContext context) : IInvoiceRepository
 {
-    private readonly ApplicationDbContext _context;
-
-    public InvoiceRepository(ApplicationDbContext context) => _context = context;
+    private readonly ApplicationDbContext _context = context;
 
     public async Task<Invoice?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         => await _context.Invoices
