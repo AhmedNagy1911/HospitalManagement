@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
 using HospitalManagement.Application.Appointments.Services;
+using HospitalManagement.Application.Billing.Services;
 using HospitalManagement.Application.Doctors.Services;
 using HospitalManagement.Application.Patients.Services;
 using HospitalManagement.Application.Rooms.Services;
@@ -23,6 +24,7 @@ public static class DependencyInjection
         services.AddScoped<IPatientService, PatientService>();
         services.AddScoped<IAppointmentService, AppointmentService>();
         services.AddScoped<IRoomService, RoomService>();
+        services.AddScoped<IInvoiceService, InvoiceService>();
 
         return services;
     }
