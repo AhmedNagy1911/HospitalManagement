@@ -16,6 +16,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Invoice> Invoices => Set<Invoice>();
     public DbSet<Prescription> Prescriptions => Set<Prescription>();
     public DbSet<PrescriptionMedication> PrescriptionMedications => Set<PrescriptionMedication>();
+    public DbSet<Employee> Employees => Set<Employee>();
+    public DbSet<Shift> Shifts => Set<Shift>();
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
