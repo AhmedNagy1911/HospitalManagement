@@ -4,6 +4,7 @@ using HospitalManagement.Application.Appointments.Services;
 using HospitalManagement.Application.Billing.Services;
 using HospitalManagement.Application.Doctors.Services;
 using HospitalManagement.Application.Patients.Services;
+using HospitalManagement.Application.Pharmacy.Services;
 using HospitalManagement.Application.Rooms.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -25,6 +26,7 @@ public static class DependencyInjection
         services.AddScoped<IAppointmentService, AppointmentService>();
         services.AddScoped<IRoomService, RoomService>();
         services.AddScoped<IInvoiceService, InvoiceService>();
+        services.AddScoped<IPrescriptionService, PrescriptionService>();
 
         return services;
     }

@@ -14,6 +14,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Room> Rooms => Set<Room>();
     public DbSet<Bed> Beds => Set<Bed>();
     public DbSet<Invoice> Invoices => Set<Invoice>();
+    public DbSet<Prescription> Prescriptions => Set<Prescription>();
+    public DbSet<PrescriptionMedication> PrescriptionMedications => Set<PrescriptionMedication>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
