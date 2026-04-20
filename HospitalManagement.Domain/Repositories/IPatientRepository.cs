@@ -4,6 +4,7 @@ namespace HospitalManagement.Domain.Repositories;
 
 public interface IPatientRepository
 {
+    Task<IEnumerable<Patient>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<Patient?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     // Loads MedicalHistories + PatientDoctors with Doctor navigation

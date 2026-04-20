@@ -7,7 +7,13 @@ namespace HospitalManagement.Infrastructure.Persistence.Repositories;
 public class PatientRepository : IPatientRepository
 {
     private readonly ApplicationDbContext _context;
-
+    public async Task<IEnumerable<Patient>> GetAllAsync(
+    CancellationToken cancellationToken = default)
+    => await _context.Patients
+        .Include(p => p.PatientDoctors)
+            .ThenInclude(pd => pd.Doctor)
+        .OrderBy(p => p.LastName).ThenBy(p => p.FirstName)
+        .ToListAsync(cancellationToken);
     public PatientRepository(ApplicationDbContext context)
         => _context = context;
 

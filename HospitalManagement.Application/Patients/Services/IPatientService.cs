@@ -6,6 +6,7 @@ namespace HospitalManagement.Application.Patients.Services;
 
 public interface IPatientService
 {
+    Task<Result<IEnumerable<PatientResponse>>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<Result<PatientResponse>> CreateAsync(
         CreatePatientRequest request, CancellationToken cancellationToken = default);
 

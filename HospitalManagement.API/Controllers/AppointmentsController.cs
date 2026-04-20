@@ -11,6 +11,13 @@ public class AppointmentsController(IAppointmentService appointmentService) : Co
 {
     private readonly IAppointmentService _appointmentService = appointmentService;
 
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    {
+        var result = await _appointmentService.GetAllAsync(cancellationToken);
+        return Ok(result.Value);
+    }
+
     // POST api/appointments
     [HttpPost]
     public async Task<IActionResult> Create(

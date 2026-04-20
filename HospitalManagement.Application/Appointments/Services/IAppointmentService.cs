@@ -6,6 +6,7 @@ namespace HospitalManagement.Application.Appointments.Services;
 
 public interface IAppointmentService
 {
+    Task<Result<IEnumerable<AppointmentResponse>>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<Result<AppointmentResponse>> CreateAsync(
         CreateAppointmentRequest request, CancellationToken cancellationToken = default);
 

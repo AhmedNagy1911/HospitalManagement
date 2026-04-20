@@ -1,4 +1,5 @@
-﻿using HospitalManagement.Application.Rooms.DTOs;
+﻿using HospitalManagement.API.Extensions;
+using HospitalManagement.Application.Rooms.DTOs;
 using HospitalManagement.Application.Rooms.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,14 +7,17 @@ namespace HospitalManagement.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class RoomsController : ControllerBase
+public class RoomsController(IRoomService roomService) : ControllerBase
 {
-    private readonly IRoomService _roomService;
-
-    public RoomsController(IRoomService roomService) => _roomService = roomService;
+    private readonly IRoomService _roomService = roomService;
 
     // ── Room CRUD ─────────────────────────────────────────────
-
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    {
+        var result = await _roomService.GetAllAsync(cancellationToken);
+        return Ok(result.Value);
+    }
     // POST api/rooms
     [HttpPost]
     public async Task<IActionResult> Create(
@@ -22,7 +26,7 @@ public class RoomsController : ControllerBase
         var result = await _roomService.CreateAsync(request, cancellationToken);
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value)
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // GET api/rooms/{id}
@@ -32,7 +36,7 @@ public class RoomsController : ControllerBase
         var result = await _roomService.GetByIdAsync(id, cancellationToken);
         return result.IsSuccess
             ? Ok(result.Value)
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // GET api/rooms?type=ICU&status=Available&floor=2&page=1&pageSize=10
@@ -52,7 +56,7 @@ public class RoomsController : ControllerBase
         var result = await _roomService.UpdateAsync(id, request, cancellationToken);
         return result.IsSuccess
             ? Ok(result.Value)
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // DELETE api/rooms/{id}
@@ -62,11 +66,19 @@ public class RoomsController : ControllerBase
         var result = await _roomService.DeleteAsync(id, cancellationToken);
         return result.IsSuccess
             ? NoContent()
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // ── Room Status ───────────────────────────────────────────
 
+    [HttpPut("{id:guid}/available")]
+    public async Task<IActionResult> SetAvailable(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _roomService.SetAvailableAsync(id, cancellationToken);
+        return result.IsSuccess
+            ? Ok()
+            : result.ToProblem();
+    }
     // PATCH api/rooms/{id}/maintenance
     [HttpPut("{id:guid}/maintenance")]
     public async Task<IActionResult> SetMaintenance(Guid id, CancellationToken cancellationToken)
@@ -74,7 +86,7 @@ public class RoomsController : ControllerBase
         var result = await _roomService.SetMaintenanceAsync(id, cancellationToken);
         return result.IsSuccess
             ? Ok()
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // PATCH api/rooms/{id}/out-of-service
@@ -84,7 +96,7 @@ public class RoomsController : ControllerBase
         var result = await _roomService.SetOutOfServiceAsync(id, cancellationToken);
         return result.IsSuccess
             ? Ok()
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // PATCH api/rooms/{id}/restore
@@ -94,7 +106,7 @@ public class RoomsController : ControllerBase
         var result = await _roomService.RestoreAsync(id, cancellationToken);
         return result.IsSuccess
             ? Ok()
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // ── Bed Management ────────────────────────────────────────
@@ -107,7 +119,7 @@ public class RoomsController : ControllerBase
         var result = await _roomService.AddBedAsync(roomId, request, cancellationToken);
         return result.IsSuccess
             ? Ok(result.Value)
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // PATCH api/rooms/{roomId}/beds/{bedId}/occupy
@@ -119,7 +131,7 @@ public class RoomsController : ControllerBase
         var result = await _roomService.OccupyBedAsync(roomId, bedId, request, cancellationToken);
         return result.IsSuccess
             ? Ok()
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // PATCH api/rooms/{roomId}/beds/{bedId}/reserve
@@ -131,7 +143,7 @@ public class RoomsController : ControllerBase
         var result = await _roomService.ReserveBedAsync(roomId, bedId, request, cancellationToken);
         return result.IsSuccess
             ? Ok()
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 
     // PATCH api/rooms/{roomId}/beds/{bedId}/release
@@ -142,6 +154,6 @@ public class RoomsController : ControllerBase
         var result = await _roomService.ReleaseBedAsync(roomId, bedId, cancellationToken);
         return result.IsSuccess
             ? Ok()
-            : Problem(result.Error.Description, statusCode: result.Error.StatusCode);
+            : result.ToProblem();
     }
 }

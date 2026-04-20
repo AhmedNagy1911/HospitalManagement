@@ -5,11 +5,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HospitalManagement.Infrastructure.Persistence.Repositories;
 
-public class RoomRepository : IRoomRepository
+public class RoomRepository(ApplicationDbContext context) : IRoomRepository
 {
-    private readonly ApplicationDbContext _context;
-
-    public RoomRepository(ApplicationDbContext context) => _context = context;
+    private readonly ApplicationDbContext _context = context;
+    public async Task<IEnumerable<Room>> GetAllAsync(
+    CancellationToken cancellationToken = default)
+    => await _context.Rooms
+        .Include(r => r.Beds)
+        .OrderBy(r => r.Floor).ThenBy(r => r.RoomNumber)
+        .ToListAsync(cancellationToken);
 
     public async Task<Room?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         => await _context.Rooms
@@ -52,7 +56,8 @@ public class RoomRepository : IRoomRepository
 
         return (rooms, totalCount);
     }
-
+    public async Task AddBedAsync(Bed bed, CancellationToken cancellationToken = default)
+    => await _context.Beds.AddAsync(bed, cancellationToken);
     public async Task AddAsync(Room room, CancellationToken cancellationToken = default)
         => await _context.Rooms.AddAsync(room, cancellationToken);
 

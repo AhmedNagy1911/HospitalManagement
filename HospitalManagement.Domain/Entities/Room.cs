@@ -76,6 +76,9 @@ public class Room
     }
 
     // ── Room-level Status ─────────────────────────────────────
+
+    public bool CanSetAvailable() =>
+       Status != RoomStatus.Available;
     public bool CanSetMaintenance() =>
         Status != RoomStatus.Maintenance && Status != RoomStatus.OutOfService;
 
@@ -85,6 +88,13 @@ public class Room
     public bool CanRestore() =>
         Status is RoomStatus.Maintenance or RoomStatus.OutOfService;
 
+
+    public void SetAvailable()
+    {
+        if (!CanSetAvailable())
+            throw new InvalidOperationException("Room is already in Available");
+        Status = RoomStatus.Available;
+    }
     public void SetMaintenance()
     {
         if (!CanSetMaintenance())

@@ -8,15 +8,15 @@ using HospitalManagement.Domain.Repositories;
 
 namespace HospitalManagement.Application.Rooms.Services;
 
-public class RoomService : IRoomService
+public class RoomService(IRoomRepository roomRepository, IPatientRepository patientRepository) : IRoomService
 {
-    private readonly IRoomRepository _roomRepository;
-    private readonly IPatientRepository _patientRepository;
-
-    public RoomService(IRoomRepository roomRepository, IPatientRepository patientRepository)
+    private readonly IRoomRepository _roomRepository = roomRepository;
+    private readonly IPatientRepository _patientRepository = patientRepository;
+    public async Task<Result<IEnumerable<RoomResponse>>> GetAllAsync(
+    CancellationToken cancellationToken = default)
     {
-        _roomRepository = roomRepository;
-        _patientRepository = patientRepository;
+        var rooms = await _roomRepository.GetAllAsync(cancellationToken);
+        return Result.Success(rooms.Select(MapToResponse));
     }
 
     // ── CREATE ────────────────────────────────────────────────
@@ -94,6 +94,20 @@ public class RoomService : IRoomService
     }
 
     // ── ROOM STATUS ───────────────────────────────────────────
+
+    public async Task<Result> SetAvailableAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var room = await _roomRepository.GetByIdAsync(id, cancellationToken);
+        if (room is null) return Result.Failure(RoomErrors.NotFound);
+
+        if (!room.CanSetAvailable())
+            return Result.Failure(RoomErrors.CannotSetAvailable);
+
+        room.SetAvailable();
+        _roomRepository.Update(room);
+        await _roomRepository.SaveChangesAsync(cancellationToken);
+        return Result.Success();
+    }
     public async Task<Result> SetMaintenanceAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var room = await _roomRepository.GetByIdAsync(id, cancellationToken);
@@ -136,9 +150,8 @@ public class RoomService : IRoomService
         return Result.Success();
     }
 
-    // ── BED MANAGEMENT ───────────────────────────────────────
     public async Task<Result<BedResponse>> AddBedAsync(
-        Guid roomId, AddBedRequest request, CancellationToken cancellationToken = default)
+    Guid roomId, AddBedRequest request, CancellationToken cancellationToken = default)
     {
         var room = await _roomRepository.GetByIdWithBedsAsync(roomId, cancellationToken);
         if (room is null)
@@ -151,12 +164,14 @@ public class RoomService : IRoomService
             return Result.Failure<BedResponse>(RoomErrors.BedNumberAlreadyExists);
 
         var bed = room.AddBed(request.BedNumber);
-        _roomRepository.Update(room);
+
+        // ❌ مش بنعمل _roomRepository.Update(room) هنا
+        // ✅ بنضيف الـ Bed مباشرة للـ context
+        await _roomRepository.AddBedAsync(bed, cancellationToken);
         await _roomRepository.SaveChangesAsync(cancellationToken);
 
         return Result.Success(MapBedToResponse(bed));
     }
-
     public async Task<Result> OccupyBedAsync(
         Guid roomId, Guid bedId, OccupyBedRequest request,
         CancellationToken cancellationToken = default)

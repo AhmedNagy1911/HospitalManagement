@@ -25,6 +25,9 @@ public static class RoomErrors
     public static readonly Error BedCannotBeReleased =
         new("Room.BedCannotBeReleased", "Bed is already available.", 400);
 
+    public static readonly Error CannotSetAvailable =
+       new("Room.CannotSetAvailable", "Room is already inAvailable.", 400);
+
     public static readonly Error CannotSetMaintenance =
         new("Room.CannotSetMaintenance", "Room is already in maintenance or out of service.", 400);
 

@@ -7,13 +7,16 @@ namespace HospitalManagement.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PatientsController : ControllerBase
+public class PatientsController(IPatientService patientService) : ControllerBase
 {
-    private readonly IPatientService _patientService;
+    private readonly IPatientService _patientService = patientService;
 
-    public PatientsController(IPatientService patientService)
-        => _patientService = patientService;
-
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    {
+        var result = await _patientService.GetAllAsync(cancellationToken);
+        return Ok(result.Value);
+    }
     // POST api/patients
     [HttpPost]
     public async Task<IActionResult> Create(

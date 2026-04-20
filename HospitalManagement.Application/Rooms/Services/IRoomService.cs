@@ -7,6 +7,7 @@ namespace HospitalManagement.Application.Rooms.Services;
 public interface IRoomService
 {
     // ── Room CRUD ─────────────────────────────────────────────
+    Task<Result<IEnumerable<RoomResponse>>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<Result<RoomResponse>> CreateAsync(
         CreateRoomRequest request, CancellationToken cancellationToken = default);
 
@@ -23,6 +24,7 @@ public interface IRoomService
         Guid id, CancellationToken cancellationToken = default);
 
     // ── Room Status ───────────────────────────────────────────
+    Task<Result> SetAvailableAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Result> SetMaintenanceAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Result> SetOutOfServiceAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Result> RestoreAsync(Guid id, CancellationToken cancellationToken = default);

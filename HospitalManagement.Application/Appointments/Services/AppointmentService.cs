@@ -7,22 +7,20 @@ using HospitalManagement.Domain.Repositories;
 
 namespace HospitalManagement.Application.Appointments.Services;
 
-public class AppointmentService : IAppointmentService
+public class AppointmentService(
+    IAppointmentRepository appointmentRepository,
+    IPatientRepository patientRepository,
+    IDoctorRepository doctorRepository) : IAppointmentService
 {
-    private readonly IAppointmentRepository _appointmentRepository;
-    private readonly IPatientRepository _patientRepository;
-    private readonly IDoctorRepository _doctorRepository;
-
-    public AppointmentService(
-        IAppointmentRepository appointmentRepository,
-        IPatientRepository patientRepository,
-        IDoctorRepository doctorRepository)
+    private readonly IAppointmentRepository _appointmentRepository = appointmentRepository;
+    private readonly IPatientRepository _patientRepository = patientRepository;
+    private readonly IDoctorRepository _doctorRepository = doctorRepository;
+    public async Task<Result<IEnumerable<AppointmentResponse>>> GetAllAsync(
+    CancellationToken cancellationToken = default)
     {
-        _appointmentRepository = appointmentRepository;
-        _patientRepository = patientRepository;
-        _doctorRepository = doctorRepository;
+        var appointments = await _appointmentRepository.GetAllAsync(cancellationToken);
+        return Result.Success(appointments.Select(MapToResponse));
     }
-
     // ── CREATE ────────────────────────────────────────────────
     public async Task<Result<AppointmentResponse>> CreateAsync(
         CreateAppointmentRequest request, CancellationToken cancellationToken = default)

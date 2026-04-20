@@ -5,6 +5,7 @@ namespace HospitalManagement.Domain.Repositories;
 
 public interface IAppointmentRepository
 {
+    Task<IEnumerable<Appointment>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<Appointment?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task<Appointment?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default);

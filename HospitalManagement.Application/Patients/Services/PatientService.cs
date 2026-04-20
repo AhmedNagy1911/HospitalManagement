@@ -14,7 +14,15 @@ public class PatientService(
     private readonly IPatientRepository _patientRepository = patientRepository;
     private readonly IDoctorRepository _doctorRepository = doctorRepository;
 
+    // ── GET ALL (simple) ───────────────────────────────────────
+    public async Task<Result<IEnumerable<PatientResponse>>> GetAllAsync(
+    CancellationToken cancellationToken = default)
+    {
+        var patients = await _patientRepository.GetAllAsync(cancellationToken);
+        return Result.Success(patients.Select(MapToResponse));
+    }
     // ── CREATE ────────────────────────────────────────────────
+
     public async Task<Result<PatientResponse>> CreateAsync(
         CreatePatientRequest request, CancellationToken cancellationToken = default)
     {

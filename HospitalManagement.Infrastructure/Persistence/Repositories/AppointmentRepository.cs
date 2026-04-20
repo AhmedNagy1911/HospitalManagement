@@ -9,6 +9,13 @@ public class AppointmentRepository(ApplicationDbContext context) : IAppointmentR
 {
     private readonly ApplicationDbContext _context = context;
 
+    public async Task<IEnumerable<Appointment>> GetAllAsync(
+    CancellationToken cancellationToken = default)
+    => await _context.Appointments
+        .Include(a => a.Patient)
+        .Include(a => a.Doctor)
+        .OrderBy(a => a.AppointmentDate)
+        .ToListAsync(cancellationToken);
     public async Task<Appointment?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         => await _context.Appointments
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
