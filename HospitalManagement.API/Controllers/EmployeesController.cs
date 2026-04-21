@@ -1,12 +1,15 @@
 ﻿using HospitalManagement.API.Extensions;
 using HospitalManagement.Application.Staff.DTOs;
 using HospitalManagement.Application.Staff.Services;
+using HospitalManagement.Domain.Constants;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalManagement.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Roles = AppRoles.Admin)]
 public class EmployeesController(IEmployeeService employeeService) : ControllerBase
 {
     private readonly IEmployeeService _employeeService = employeeService;

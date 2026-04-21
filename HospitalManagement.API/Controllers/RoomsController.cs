@@ -1,12 +1,15 @@
 ﻿using HospitalManagement.API.Extensions;
 using HospitalManagement.Application.Rooms.DTOs;
 using HospitalManagement.Application.Rooms.Services;
+using HospitalManagement.Domain.Constants;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalManagement.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Roles = AppRoles.Admin)]
 public class RoomsController(IRoomService roomService) : ControllerBase
 {
     private readonly IRoomService _roomService = roomService;

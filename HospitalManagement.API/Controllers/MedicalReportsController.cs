@@ -1,12 +1,14 @@
 ﻿using HospitalManagement.API.Extensions;
 using HospitalManagement.Application.Reports.DTOs;
 using HospitalManagement.Application.Reports.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalManagement.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Policy = "MedicalStaff")]
 public class MedicalReportsController(IMedicalReportService reportService) : ControllerBase
 {
     private readonly IMedicalReportService _reportService = reportService;

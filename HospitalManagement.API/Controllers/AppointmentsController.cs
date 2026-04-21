@@ -1,12 +1,14 @@
 ﻿using HospitalManagement.API.Extensions;
 using HospitalManagement.Application.Appointments.DTOs;
 using HospitalManagement.Application.Appointments.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalManagement.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class AppointmentsController(IAppointmentService appointmentService) : ControllerBase
 {
     private readonly IAppointmentService _appointmentService = appointmentService;

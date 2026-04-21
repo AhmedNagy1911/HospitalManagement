@@ -1,12 +1,14 @@
 ﻿using HospitalManagement.API.Extensions;
 using HospitalManagement.Application.Patients.DTOs;
 using HospitalManagement.Application.Patients.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalManagement.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Policy = "FrontDesk")]
 public class PatientsController(IPatientService patientService) : ControllerBase
 {
     private readonly IPatientService _patientService = patientService;

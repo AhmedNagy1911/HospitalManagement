@@ -1,6 +1,7 @@
 ﻿using HospitalManagement.API.Extensions;
 using HospitalManagement.Application.Doctors.DTOs;
 using HospitalManagement.Application.Doctors.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace HospitalManagement.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public sealed class DoctorsController(IDoctorService doctorService) : ControllerBase
 {
     [HttpGet]
