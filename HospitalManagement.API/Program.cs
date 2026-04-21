@@ -1,7 +1,6 @@
 using HospitalManagement.API.Middleware;
 using HospitalManagement.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,8 +14,6 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-
-
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();

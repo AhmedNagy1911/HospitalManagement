@@ -18,6 +18,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<PrescriptionMedication> PrescriptionMedications => Set<PrescriptionMedication>();
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<Shift> Shifts => Set<Shift>();
+    public DbSet<MedicalReport> MedicalReports => Set<MedicalReport>();
+    public DbSet<LabResult> LabResults => Set<LabResult>();
+    public DbSet<RadiologyResult> RadiologyResults => Set<RadiologyResult>();
+    public DbSet<GeneralReportDetail> GeneralReportDetails => Set<GeneralReportDetail>();
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
