@@ -1,25 +1,49 @@
 ﻿using HospitalManagement.Application.Common;
+using HospitalManagement.Application.Constants;
 using HospitalManagement.Application.Patients.DTOs;
 using HospitalManagement.Domain.Abstractions;
 using HospitalManagement.Domain.Entities;
 using HospitalManagement.Domain.Errors;
 using HospitalManagement.Domain.Repositories;
+using Microsoft.Extensions.Caching.Hybrid;
 
 namespace HospitalManagement.Application.Patients.Services;
 
 public class PatientService(
     IPatientRepository patientRepository,
-    IDoctorRepository doctorRepository) : IPatientService
+    IDoctorRepository doctorRepository,
+    HybridCache cache) : IPatientService
 {
     private readonly IPatientRepository _patientRepository = patientRepository;
     private readonly IDoctorRepository _doctorRepository = doctorRepository;
+    private readonly HybridCache _cache = cache;
 
     // ── GET ALL (simple) ───────────────────────────────────────
+    //public async Task<Result<IEnumerable<PatientResponse>>> GetAllAsync(
+    //CancellationToken cancellationToken = default)
+    //{
+    //    var patients = await _patientRepository.GetAllAsync(cancellationToken);
+    //    return Result.Success(patients.Select(MapToResponse));
+    //}
     public async Task<Result<IEnumerable<PatientResponse>>> GetAllAsync(
-    CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default)
     {
-        var patients = await _patientRepository.GetAllAsync(cancellationToken);
-        return Result.Success(patients.Select(MapToResponse));
+        var result = await _cache.GetOrCreateAsync(
+            CacheKeys.PatientsAll,
+            async ct =>
+            {
+                var patients = await _patientRepository.GetAllAsync(ct);
+                return patients.Select(MapToResponse).ToList();
+            },
+            new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromMinutes(10),
+                LocalCacheExpiration = TimeSpan.FromMinutes(2)
+            },
+            tags: [CacheKeys.TagPatients],
+            cancellationToken: cancellationToken);
+
+        return Result.Success<IEnumerable<PatientResponse>>(result);
     }
     // ── CREATE ────────────────────────────────────────────────
 
@@ -38,6 +62,7 @@ public class PatientService(
         await _patientRepository.AddAsync(patient, cancellationToken);
         await _patientRepository.SaveChangesAsync(cancellationToken);
 
+        await _cache.RemoveByTagAsync(CacheKeys.TagPatients, cancellationToken);
         return Result.Success(MapToResponse(patient));
     }
 
@@ -53,19 +78,49 @@ public class PatientService(
     }
 
     // ── GET ALL (with filter + paging) ────────────────────────
+    //public async Task<Result<PagedResult<PatientResponse>>> GetAllAsync(
+    //    PatientFilterRequest filter, CancellationToken cancellationToken = default)
+    //{
+    //    var (patients, totalCount) = await _patientRepository.GetAllAsync(
+    //        filter.SearchTerm, filter.Gender, filter.BloodType,
+    //        filter.IsActive, filter.Page, filter.PageSize, cancellationToken);
+
+    //    var paged = new PagedResult<PatientResponse>(
+    //        patients.Select(MapToResponse),
+    //        totalCount, filter.Page, filter.PageSize);
+
+    //    return Result.Success(paged);
+    //}
     public async Task<Result<PagedResult<PatientResponse>>> GetAllAsync(
         PatientFilterRequest filter, CancellationToken cancellationToken = default)
     {
-        var (patients, totalCount) = await _patientRepository.GetAllAsync(
+        var cacheKey = CacheKeys.PatientsFiltered(
             filter.SearchTerm, filter.Gender, filter.BloodType,
-            filter.IsActive, filter.Page, filter.PageSize, cancellationToken);
+            filter.IsActive, filter.Page, filter.PageSize);
 
-        var paged = new PagedResult<PatientResponse>(
-            patients.Select(MapToResponse),
-            totalCount, filter.Page, filter.PageSize);
+        var result = await _cache.GetOrCreateAsync(
+            cacheKey,
+            async ct =>
+            {
+                var (patients, totalCount) = await _patientRepository.GetAllAsync(
+                    filter.SearchTerm, filter.Gender, filter.BloodType,
+                    filter.IsActive, filter.Page, filter.PageSize, ct);
 
-        return Result.Success(paged);
+                return new PagedResult<PatientResponse>(
+                    patients.Select(MapToResponse),
+                    totalCount, filter.Page, filter.PageSize);
+            },
+            new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromMinutes(5),
+                LocalCacheExpiration = TimeSpan.FromMinutes(1)
+            },
+            tags: [CacheKeys.TagPatients],
+            cancellationToken: cancellationToken);
+
+        return Result.Success(result);
     }
+
 
     // ── UPDATE ────────────────────────────────────────────────
     public async Task<Result<PatientResponse>> UpdateAsync(
@@ -86,6 +141,7 @@ public class PatientService(
         _patientRepository.Update(patient);
         await _patientRepository.SaveChangesAsync(cancellationToken);
 
+        await _cache.RemoveByTagAsync(CacheKeys.TagPatients, cancellationToken);
         return Result.Success(MapToResponse(patient));
     }
 
@@ -104,6 +160,7 @@ public class PatientService(
         _patientRepository.Update(patient);
         await _patientRepository.SaveChangesAsync(cancellationToken);
 
+        await _cache.RemoveByTagAsync(CacheKeys.TagPatients, cancellationToken);
         return Result.Success();
     }
 
@@ -135,6 +192,7 @@ public class PatientService(
         _patientRepository.Update(patient);
         await _patientRepository.SaveChangesAsync(cancellationToken);
 
+        await _cache.RemoveByTagAsync(CacheKeys.TagPatients, cancellationToken);
         return Result.Success();
     }
 
@@ -158,6 +216,7 @@ public class PatientService(
         _patientRepository.Update(patient);
         await _patientRepository.SaveChangesAsync(cancellationToken);
 
+        await _cache.RemoveByTagAsync(CacheKeys.TagPatients, cancellationToken);
         return Result.Success();
     }
 

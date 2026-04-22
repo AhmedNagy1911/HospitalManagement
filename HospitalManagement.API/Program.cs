@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,11 +15,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+// ?? Serilog Configuration 
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration)
+);
+
+
 // Global Exception Handling
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
-// ?? ASP.NET Identity ??????????????????????????????????????????
+// ?? ASP.NET Identity 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     // Password rules
@@ -38,7 +45,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// ?? JWT Authentication ????????????????????????????????????????
+// ?? JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 
 builder.Services.AddAuthentication(options =>
@@ -61,7 +68,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ?? Authorization Policies ????????????????????????????????????
+// ?? Authorization Policies 
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly",
@@ -80,7 +87,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 
 builder.Services.AddSwaggerGen();
-// ?? Swagger with JWT support ??????????????????????????????????
+// ?? Swagger with JWT support
 
 // Dependency Injection
 builder.Services.AddApplication();
@@ -89,7 +96,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
-// ?? Seed Roles + Default Admin ????????????????????????????????
+// ?? Seed Roles + Default Admin 
 await SeedAsync(app);
 
 
@@ -100,6 +107,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseSerilogRequestLogging();
+
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();

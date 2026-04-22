@@ -1,26 +1,52 @@
 ﻿using HospitalManagement.Application.Appointments.DTOs;
 using HospitalManagement.Application.Common;
+using HospitalManagement.Application.Constants;
 using HospitalManagement.Domain.Abstractions;
 using HospitalManagement.Domain.Entities;
 using HospitalManagement.Domain.Errors;
 using HospitalManagement.Domain.Repositories;
+using Microsoft.Extensions.Caching.Hybrid;
 
 namespace HospitalManagement.Application.Appointments.Services;
 
 public class AppointmentService(
     IAppointmentRepository appointmentRepository,
     IPatientRepository patientRepository,
-    IDoctorRepository doctorRepository) : IAppointmentService
+    IDoctorRepository doctorRepository,
+    HybridCache cache) : IAppointmentService
 {
     private readonly IAppointmentRepository _appointmentRepository = appointmentRepository;
     private readonly IPatientRepository _patientRepository = patientRepository;
     private readonly IDoctorRepository _doctorRepository = doctorRepository;
+    private readonly HybridCache _cache = cache;
+
+    //public async Task<Result<IEnumerable<AppointmentResponse>>> GetAllAsync(
+    //CancellationToken cancellationToken = default)
+    //{
+    //    var appointments = await _appointmentRepository.GetAllAsync(cancellationToken);
+    //    return Result.Success(appointments.Select(MapToResponse));
+    //}
     public async Task<Result<IEnumerable<AppointmentResponse>>> GetAllAsync(
-    CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default)
     {
-        var appointments = await _appointmentRepository.GetAllAsync(cancellationToken);
-        return Result.Success(appointments.Select(MapToResponse));
+        var result = await _cache.GetOrCreateAsync(
+            CacheKeys.AppointmentsAll,
+            async ct =>
+            {
+                var appointments = await _appointmentRepository.GetAllAsync(ct);
+                return appointments.Select(MapToResponse).ToList();
+            },
+            new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromMinutes(3),  // Appointments بتتغير أكتر
+                LocalCacheExpiration = TimeSpan.FromMinutes(1)
+            },
+            tags: [CacheKeys.TagAppointments],
+            cancellationToken: cancellationToken);
+
+        return Result.Success<IEnumerable<AppointmentResponse>>(result);
     }
+
     // ── CREATE ────────────────────────────────────────────────
     public async Task<Result<AppointmentResponse>> CreateAsync(
         CreateAppointmentRequest request, CancellationToken cancellationToken = default)
@@ -59,6 +85,7 @@ public class AppointmentService(
         await _appointmentRepository.AddAsync(appointment, cancellationToken);
         await _appointmentRepository.SaveChangesAsync(cancellationToken);
 
+        await _cache.RemoveByTagAsync(CacheKeys.TagAppointments, cancellationToken);
         return Result.Success(MapToResponse(appointment, patient, doctor));
     }
 
@@ -74,21 +101,57 @@ public class AppointmentService(
     }
 
     // ── GET ALL ───────────────────────────────────────────────
+
+    //public async Task<Result<PagedResult<AppointmentResponse>>> GetAllAsync(
+    //    AppointmentFilterRequest filter, CancellationToken cancellationToken = default)
+    //{
+    //    var (appointments, totalCount) = await _appointmentRepository.GetAllAsync(
+    //        filter.PatientId, filter.DoctorId, filter.Status,
+    //        filter.DateFrom, filter.DateTo,
+    //        filter.Page, filter.PageSize, cancellationToken);
+
+    //    var paged = new PagedResult<AppointmentResponse>(
+    //        appointments.Select(MapToResponse),
+    //        totalCount, filter.Page, filter.PageSize);
+
+    //    return Result.Success(paged);
+    //}
+
+
+
     public async Task<Result<PagedResult<AppointmentResponse>>> GetAllAsync(
-        AppointmentFilterRequest filter, CancellationToken cancellationToken = default)
+       AppointmentFilterRequest filter, CancellationToken cancellationToken = default)
     {
-        var (appointments, totalCount) = await _appointmentRepository.GetAllAsync(
-            filter.PatientId, filter.DoctorId, filter.Status,
-            filter.DateFrom, filter.DateTo,
-            filter.Page, filter.PageSize, cancellationToken);
+        var cacheKey = CacheKeys.AppointmentsFiltered(
+            filter.PatientId, filter.DoctorId,
+            filter.Status?.ToString(),
+            filter.DateFrom?.ToString("yyyyMMdd"),
+            filter.DateTo?.ToString("yyyyMMdd"),
+            filter.Page, filter.PageSize);
 
-        var paged = new PagedResult<AppointmentResponse>(
-            appointments.Select(MapToResponse),
-            totalCount, filter.Page, filter.PageSize);
+        var result = await _cache.GetOrCreateAsync(
+            cacheKey,
+            async ct =>
+            {
+                var (appointments, totalCount) = await _appointmentRepository.GetAllAsync(
+                    filter.PatientId, filter.DoctorId, filter.Status,
+                    filter.DateFrom, filter.DateTo,
+                    filter.Page, filter.PageSize, ct);
 
-        return Result.Success(paged);
+                return new PagedResult<AppointmentResponse>(
+                    appointments.Select(MapToResponse),
+                    totalCount, filter.Page, filter.PageSize);
+            },
+            new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromMinutes(3),
+                LocalCacheExpiration = TimeSpan.FromMinutes(1)
+            },
+            tags: [CacheKeys.TagAppointments],
+            cancellationToken: cancellationToken);
+
+        return Result.Success(result);
     }
-
     // ── UPDATE ────────────────────────────────────────────────
     public async Task<Result<AppointmentResponse>> UpdateAsync(
         Guid id, UpdateAppointmentRequest request, CancellationToken cancellationToken = default)
@@ -119,6 +182,7 @@ public class AppointmentService(
         _appointmentRepository.Update(appointment);
         await _appointmentRepository.SaveChangesAsync(cancellationToken);
 
+        await _cache.RemoveByTagAsync(CacheKeys.TagAppointments, cancellationToken);
         return Result.Success(MapToResponse(appointment));
     }
 
