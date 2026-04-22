@@ -19,8 +19,4 @@
     <ProjectReference Include="..\HospitalManagement.Domain\HospitalManagement.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Dashboard\DTOs\" />
-  </ItemGroup>
-
 </Project>

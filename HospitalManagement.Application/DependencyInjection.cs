@@ -3,6 +3,7 @@ using FluentValidation.AspNetCore;
 using HospitalManagement.Application.Appointments.Services;
 using HospitalManagement.Application.Auth.Services;
 using HospitalManagement.Application.Billing.Services;
+using HospitalManagement.Application.Dashboard.Services;
 using HospitalManagement.Application.Doctors.Services;
 using HospitalManagement.Application.Patients.Services;
 using HospitalManagement.Application.Pharmacy.Services;
@@ -35,6 +36,7 @@ public static class DependencyInjection
         services.AddScoped<IMedicalReportService, MedicalReportService>();
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IDashboardService, DashboardService>();
 
         //  Caching
         services.AddHybridCache(options =>
